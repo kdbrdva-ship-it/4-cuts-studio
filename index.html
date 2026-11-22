@@ -31,7 +31,7 @@ button{
  background:white;color:#111;font-weight:bold;
  font-size:13px;letter-spacing:1px;cursor:pointer;margin:8px
 }
-button:disabled{opacity:.4}
+button:disabled{opacity:.4;cursor:default}
 .camera{max-width:420px;margin:20px auto}
 video{
  width:100%;aspect-ratio:4/5;object-fit:cover;
@@ -40,9 +40,25 @@ video{
 }
 #status{color:#bbb;font-size:13px;min-height:22px;margin:12px}
 #count{font-size:45px;font-weight:bold;margin:10px}
-#result{margin:25px auto;max-width:360px}
+#result{margin:25px auto;max-width:390px}
 canvas{width:100%;height:auto;border-radius:4px}
 .hidden{display:none}
+.frames{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:12px;margin:20px 0
+}
+.frame-card{
+ background:#181818;border:1px solid #333;
+ border-radius:10px;padding:8px
+}
+.frame-card canvas{width:100%;display:block}
+.frame-card p{font-size:12px;color:#aaa;margin:9px 0 2px}
+.frame-card button{
+ font-size:10px;padding:11px 12px;margin:8px 0 3px;
+ width:100%;letter-spacing:.5px
+}
+.actions{display:flex;flex-direction:column;align-items:center}
+.actions button{width:100%;max-width:300px}
 .note{
  font-size:11px;color:#777;line-height:1.6;
  margin:25px auto;max-width:330px
@@ -76,16 +92,45 @@ canvas{width:100%;height:auto;border-radius:4px}
 <video id="video" autoplay playsinline muted></video>
 <div id="status">Выбери стиль и включи камеру</div>
 <div id="count"></div>
-<button onclick="startCamera()">OPEN CAMERA</button>
-<button id="shoot" onclick="startSession()" disabled>START PHOTO SESSION</button>
+<button id="cameraBtn" onclick="startCamera()">OPEN CAMERA</button>
+<button id="shoot" onclick="startSession()" disabled>
+START PHOTO SESSION
+</button>
 </div>
 
 <div id="result" class="hidden">
 <h2>YOUR PHOTO STRIP</h2>
 <canvas id="output"></canvas>
-<br>
-<button onclick="downloadPhoto()">DOWNLOAD JPG</button>
-<button onclick="again()">TAKE AGAIN</button>
+
+<h2>YOUR FOUR CUTS</h2>
+<div class="frames">
+ <div class="frame-card">
+  <canvas id="frame0"></canvas>
+  <p>PHOTO 01</p>
+  <button onclick="retake(0)" id="retake0">RETAKE PHOTO</button>
+ </div>
+ <div class="frame-card">
+  <canvas id="frame1"></canvas>
+  <p>PHOTO 02</p>
+  <button onclick="retake(1)" id="retake1">RETAKE PHOTO</button>
+ </div>
+ <div class="frame-card">
+  <canvas id="frame2"></canvas>
+  <p>PHOTO 03</p>
+  <button onclick="retake(2)" id="retake2">RETAKE PHOTO</button>
+ </div>
+ <div class="frame-card">
+  <canvas id="frame3"></canvas>
+  <p>PHOTO 04</p>
+  <button onclick="retake(3)" id="retake3">RETAKE PHOTO</button>
+ </div>
+</div>
+
+<div class="actions">
+ <button onclick="saveToGallery()">SAVE TO GALLERY ♡</button>
+ <button onclick="sharePhoto()">SHARE PHOTO</button>
+ <button onclick="again()">NEW PHOTO SESSION</button>
+</div>
 </div>
 
 <div class="note">
@@ -110,7 +155,11 @@ const PHOTO_W=1080;
 const PHOTO_H=1350;
 
 function chooseTheme(btn){
- document.querySelectorAll('.theme').forEach(x=>x.classList.remove('active'));
+ if(busy)return;
+
+ document.querySelectorAll('.theme').forEach(x=>{
+  x.classList.remove('active');
+ });
  btn.classList.add('active');
  selected=btn.dataset.theme;
  statusText.textContent='Стиль выбран! Теперь включи камеру.';
@@ -141,7 +190,17 @@ async function startCamera(){
 }
 
 function wait(ms){
- return new Promise(r=>setTimeout(r,ms));
+ return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+async function countdown(){
+ for(let n=3;n>0;n--){
+  count.textContent=n;
+  await wait(1000);
+ }
+ count.textContent='✦';
+ await wait(300);
+ count.textContent='';
 }
 
 async function startSession(){
@@ -153,26 +212,20 @@ async function startSession(){
 
  document.getElementById('result').classList.add('hidden');
 
- for(let i=0;i<4;i++){
-  statusText.textContent='PHOTO '+(i+1)+' OF 4';
-
-  for(let n=3;n>0;n--){
-   count.textContent=n;
-   await wait(1000);
+ try{
+  for(let i=0;i<4;i++){
+   statusText.textContent='PHOTO '+(i+1)+' OF 4';
+   await countdown();
+   photos.push(capture());
+   await wait(500);
   }
 
-  count.textContent='✦';
-  await wait(300);
-
-  photos.push(capture());
-  count.textContent='';
-  await wait(500);
+  renderAll();
+  document.getElementById('result').classList.remove('hidden');
+  statusText.textContent='Готово! Теперь можешь переснять любой кадр ♡';
+ }catch(e){
+  statusText.textContent='Что-то пошло не так. Попробуй ещё раз.';
  }
-
- renderStrip();
-
- document.getElementById('result').classList.remove('hidden');
- statusText.textContent='Готово! Твоя фотополоска готова ♡';
 
  busy=false;
  shoot.disabled=false;
@@ -188,7 +241,6 @@ function capture(){
  const sw=video.videoWidth;
  const sh=video.videoHeight;
 
- // Кадрирование без растягивания изображения
  const targetRatio=PHOTO_W/PHOTO_H;
  const sourceRatio=sw/sh;
 
@@ -202,7 +254,6 @@ function capture(){
   sy=(sh-sHeight)/2;
  }
 
- // Зеркальное отображение как в селфи
  x.save();
  x.translate(PHOTO_W,0);
  x.scale(-1,1);
@@ -267,6 +318,52 @@ function decoratePhoto(x){
  }
 }
 
+// Пересъёмка только выбранного кадра
+async function retake(index){
+ if(!stream||busy)return;
+
+ busy=true;
+ shoot.disabled=true;
+
+ document.querySelectorAll('.frame-card button').forEach(b=>{
+  b.disabled=true;
+ });
+
+ statusText.textContent='Переснимаем PHOTO '+(index+1);
+
+ try{
+  await countdown();
+
+  // Меняем только один элемент массива
+  photos[index]=capture();
+
+  renderAll();
+
+  statusText.textContent='PHOTO '+(index+1)+' обновлено! Остальные кадры сохранены ♡';
+ }catch(e){
+  statusText.textContent='Не удалось переснять кадр. Попробуй ещё раз.';
+ }
+
+ busy=false;
+ shoot.disabled=false;
+
+ document.querySelectorAll('.frame-card button').forEach(b=>{
+  b.disabled=false;
+ });
+}
+
+// Обновляем все миниатюры и готовую фотополоску
+function renderAll(){
+ photos.forEach((photo,i)=>{
+  const c=document.getElementById('frame'+i);
+  c.width=PHOTO_W;
+  c.height=PHOTO_H;
+  c.getContext('2d').drawImage(photo,0,0);
+ });
+
+ renderStrip();
+}
+
 function renderStrip(){
  const w=1140;
  const margin=30;
@@ -274,7 +371,6 @@ function renderStrip(){
  const gap=35;
  const top=190;
  const bottom=120;
-
  const h=top+4*(photoHeight+gap)+bottom;
 
  output.width=w;
@@ -310,7 +406,7 @@ function renderStrip(){
  photos.forEach((photo,i)=>{
   const y=top+i*(photoHeight+gap);
 
-  out.drawImage(photo,margin,y,PHOTO_W,PHOTO_H);
+  out.drawImage(photo,margin,y,PHOTO_W,photoHeight);
 
   out.strokeStyle=ink;
   out.lineWidth=selected==='pink'?7:4;
@@ -337,14 +433,88 @@ function renderStrip(){
  out.fillText('THANK YOU FOR THE MEMORIES',w/2,h-55);
 }
 
-function downloadPhoto(){
- const link=document.createElement('a');
- link.download='4-cuts-studio.jpg';
- link.href=output.toDataURL('image/jpeg',0.98);
- link.click();
+// Создаём JPG
+function createImageFile(){
+ return new Promise((resolve,reject)=>{
+  output.toBlob(blob=>{
+   if(blob){
+    resolve(new File(
+     [blob],
+     '4-cuts-studio.jpg',
+     {type:'image/jpeg'}
+    ));
+   }else{
+    reject(new Error('Не удалось создать изображение'));
+   }
+  },'image/jpeg',0.98);
+ });
+}
+
+// Сохранение через меню iPhone
+async function saveToGallery(){
+ try{
+  const file=await createImageFile();
+
+  if(navigator.share&&navigator.canShare&&
+     navigator.canShare({files:[file]})){
+   await navigator.share({
+    files:[file],
+    title:'4 CUTS STUDIO',
+    text:'My four cuts ♡'
+   });
+   statusText.textContent='Выбери «Сохранить изображение» в меню iPhone ♡';
+  }else{
+   openImageForSaving(file);
+  }
+ }catch(e){
+  if(e.name==='AbortError'){
+   statusText.textContent='Сохранение отменено.';
+  }else{
+   statusText.textContent='Не получилось открыть меню. Попробуй SHARE PHOTO.';
+  }
+ }
+}
+
+// Отправка фотографии
+async function sharePhoto(){
+ try{
+  const file=await createImageFile();
+
+  if(navigator.share&&navigator.canShare&&
+     navigator.canShare({files:[file]})){
+   await navigator.share({
+    files:[file],
+    title:'4 CUTS STUDIO',
+    text:'My four cuts ♡'
+   });
+  }else{
+   openImageForSaving(file);
+   statusText.textContent='Изображение открыто. Можно сохранить его через браузер.';
+  }
+ }catch(e){
+  if(e.name!=='AbortError'){
+   statusText.textContent='Не удалось открыть меню отправки.';
+  }
+ }
+}
+
+function openImageForSaving(file){
+ const url=URL.createObjectURL(file);
+ const newTab=window.open(url,'_blank');
+
+ if(!newTab){
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=file.name;
+  link.click();
+ }
+
+ statusText.textContent='Открой изображение и сохрани его в Фото.';
 }
 
 function again(){
+ if(busy)return;
+
  photos=[];
  document.getElementById('result').classList.add('hidden');
  statusText.textContent='Готова к новой съёмке!';
