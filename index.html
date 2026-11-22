@@ -1,31 +1,769 @@
-4 CUTS STUDIO
-YOUR MOMENT · YOUR FOUR CUTS
 
-01 — CHOOSE YOUR MOOD
-CLASSIC B&W
-Black & white film
-COQUETTE
-Soft pink mood
-VINTAGE
-Warm retro tones
-COLORFUL
-True colors
-02 — SET UP YOUR SESSION
-      Front camera
-      Back camera
-    
-      3 sec countdown
-      5 sec countdown
-      No countdown
-    
-YOUR CAMERA PREVIEW
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<title>4 CUTS STUDIO</title>
 
-Allow camera access to begin
-Your photos stay in this browser session.
-START PHOTO SESSION
+<style>
+:root {
+  --bg: #090909;
+  --panel: #151515;
+  --line: #303030;
+  --muted: #a5a5a5;
+  --white: #f5f2ee;
+  --accent: #d8c6b4;
+}
 
+* { box-sizing: border-box; }
 
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
 
+button, select { font: inherit; }
 
-The studio takes four pictures with a short pause between each shot. Use good, even lighting and place your phone securely.
-MADE FOR YOUR LITTLE MOMENTS ♡
+.wrap {
+  width: min(100%, 760px);
+  margin: auto;
+  padding: 28px 18px 48px;
+}
+
+header {
+  text-align: center;
+  padding: 18px 0 28px;
+}
+
+.brand {
+  font-size: clamp(30px, 8vw, 48px);
+  letter-spacing: .16em;
+  font-weight: 300;
+  margin: 0;
+}
+
+.tag {
+  font-size: 10px;
+  letter-spacing: .34em;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  margin: 0 auto 26px;
+  max-width: 520px;
+}
+
+h2 {
+  font-size: 13px;
+  letter-spacing: .18em;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+
+p.note {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.styles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.style {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--white);
+  padding: 13px;
+  text-align: left;
+  cursor: pointer;
+  min-height: 76px;
+}
+
+.style.active {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.style strong {
+  display: block;
+  font-size: 12px;
+  letter-spacing: .1em;
+  margin-bottom: 6px;
+}
+
+.style small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0 18px;
+}
+
+select, .secondary {
+  background: #171717;
+  color: var(--white);
+  border: 1px solid var(--line);
+  padding: 12px 13px;
+  min-height: 44px;
+}
+
+button.primary {
+  width: 100%;
+  border: 0;
+  background: var(--white);
+  color: #111;
+  padding: 15px 18px;
+  letter-spacing: .13em;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.secondary {
+  cursor: pointer;
+  flex: 1;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.camera-box {
+  background: #111;
+  border: 1px solid var(--line);
+  padding: 10px;
+  margin: 16px 0;
+}
+
+.camera-stage {
+  position: relative;
+  background: #222;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  display: none;
+}
+
+#countdown {
+  position: absolute;
+  font-size: 76px;
+  font-weight: 200;
+  text-shadow: 0 2px 18px #000;
+  display: none;
+}
+
+#placeholder {
+  color: #aaa;
+  font-size: 12px;
+  text-align: center;
+  padding: 25px;
+  line-height: 1.6;
+}
+
+.status {
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  margin: 12px 0 0;
+  min-height: 16px;
+}
+
+.progress {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #777;
+  border-radius: 50%;
+}
+
+.dot.done {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.result {
+  display: none;
+  margin-top: 30px;
+}
+
+.strip-wrap {
+  display: flex;
+  justify-content: center;
+  background: #111;
+  padding: 20px 10px;
+  border: 1px solid var(--line);
+}
+
+#strip {
+  width: min(100%, 300px);
+  background: #090909;
+  padding: 9px 9px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.frame {
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #222;
+  position: relative;
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.strip-footer {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: .3em;
+  color: #ddd;
+  padding-top: 7px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.result-actions button {
+  flex: 1;
+}
+
+.foot {
+  text-align: center;
+  color: #666;
+  font-size: 10px;
+  letter-spacing: .12em;
+  margin-top: 42px;
+}
+
+.hidden { display: none !important; }
+
+@media(min-width:600px) {
+  .styles {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .style { min-height: 88px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<header>
+  <h1 class="brand">4 CUTS STUDIO</h1>
+  <div class="tag">YOUR MOMENT · YOUR FOUR CUTS</div>
+</header>
+
+<div class="rule"></div>
+
+<section>
+  <h2>01 — Choose your mood</h2>
+
+  <div class="styles">
+    <button class="style active" data-style="mono">
+      <strong>CLASSIC B&W</strong>
+      <small>Black & white film</small>
+    </button>
+
+    <button class="style" data-style="pink">
+      <strong>COQUETTE</strong>
+      <small>Soft pink mood</small>
+    </button>
+
+    <button class="style" data-style="vintage">
+      <strong>VINTAGE</strong>
+      <small>Warm retro tones</small>
+    </button>
+
+    <button class="style" data-style="color">
+      <strong>COLORFUL</strong>
+      <small>True colors</small>
+    </button>
+  </div>
+</section>
+
+<section>
+  <h2>02 — Set up your session</h2>
+
+  <div class="controls">
+    <select id="cameraChoice" aria-label="Camera">
+      <option value="user">Front camera</option>
+      <option value="environment">Back camera</option>
+    </select>
+
+    <select id="timerChoice" aria-label="Countdown">
+      <option value="3">3 sec countdown</option>
+      <option value="5">5 sec countdown</option>
+      <option value="0">No countdown</option>
+    </select>
+  </div>
+
+  <div class="camera-box">
+    <div class="camera-stage">
+      <video id="video" autoplay playsinline muted></video>
+
+      <div id="placeholder">
+        YOUR CAMERA PREVIEW
+        <br><br>
+        Allow camera access to begin
+      </div>
+
+      <div id="countdown"></div>
+    </div>
+
+    <div class="status" id="status">
+      Your photos stay in this browser session.
+    </div>
+  </div>
+
+  <button class="primary" id="startBtn">
+    START PHOTO SESSION
+  </button>
+
+  <div class="progress" id="progress">
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <p class="note">
+    The studio takes four pictures with a short pause between each shot.
+    Use good, even lighting and place your phone securely.
+  </p>
+</section>
+
+<section class="result" id="result">
+
+  <div class="rule"></div>
+
+  <h2>03 — Your photo strip</h2>
+
+  <div class="strip-wrap">
+    <div id="strip">
+      <div id="frames"></div>
+      <div class="strip-footer">4 CUTS STUDIO</div>
+    </div>
+  </div>
+
+  <div class="result-actions">
+    <button class="secondary" id="retakeBtn">
+      RETAKE
+    </button>
+
+    <button class="primary" id="saveBtn">
+      SAVE PHOTO STRIP
+    </button>
+  </div>
+
+  <p class="note">
+    On iPhone, if the image opens in a new tab,
+    press and hold it, then choose Save to Photos.
+  </p>
+
+</section>
+
+<div class="foot">
+  MADE FOR YOUR LITTLE MOMENTS ♡
+</div>
+
+</div>
+
+<canvas id="canvas" class="hidden"></canvas>
+
+<script>
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const statusEl = document.getElementById('status');
+const placeholder = document.getElementById('placeholder');
+const countdownEl = document.getElementById('countdown');
+const startBtn = document.getElementById('startBtn');
+const result = document.getElementById('result');
+const framesEl = document.getElementById('frames');
+
+const progressDots = [...document.querySelectorAll('.dot')];
+
+let stream = null;
+let selectedStyle = 'mono';
+let photos = [];
+let busy = false;
+
+const filters = {
+  mono: 'grayscale(1) contrast(1.12) brightness(.94)',
+  pink: 'sepia(.12) saturate(1.18) hue-rotate(305deg) brightness(1.05)',
+  vintage: 'sepia(.48) saturate(.78) contrast(1.08) brightness(.94)',
+  color: 'none'
+};
+
+document.querySelectorAll('.style').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.style').forEach(b =>
+      b.classList.remove('active')
+    );
+
+    btn.classList.add('active');
+    selectedStyle = btn.dataset.style;
+  });
+});
+
+async function openCamera() {
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error(
+      'Camera access needs Safari/Chrome on a secure HTTPS page.'
+    );
+  }
+
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: document.getElementById('cameraChoice').value,
+      width: { ideal: 1280 },
+      height: { ideal: 960 }
+    },
+    audio: false
+  });
+
+  video.srcObject = stream;
+  video.style.display = 'block';
+
+  video.style.transform =
+    document.getElementById('cameraChoice').value === 'user'
+      ? 'scaleX(-1)'
+      : 'none';
+
+  placeholder.classList.add('hidden');
+
+  await video.play();
+}
+
+document.getElementById('cameraChoice')
+  .addEventListener('change', async () => {
+
+    if (stream) {
+      try {
+        await openCamera();
+        statusEl.textContent = 'Camera changed. Ready when you are.';
+      } catch (e) {
+        statusEl.textContent = e.message;
+      }
+    }
+  });
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function countdown(seconds) {
+
+  if (seconds === 0) return;
+
+  countdownEl.style.display = 'block';
+
+  for (let n = seconds; n > 0; n--) {
+    countdownEl.textContent = n;
+    await wait(1000);
+  }
+
+  countdownEl.style.display = 'none';
+}
+
+function capture() {
+
+  const w = video.videoWidth;
+  const h = video.videoHeight;
+
+  if (!w || !h) {
+    throw new Error('Camera is not ready yet. Please try again.');
+  }
+
+  canvas.width = w;
+  canvas.height = h;
+
+  ctx.save();
+
+  if (document.getElementById('cameraChoice').value === 'user') {
+    ctx.translate(w, 0);
+    ctx.scale(-1, 1);
+  }
+
+  ctx.filter = filters[selectedStyle];
+  ctx.drawImage(video, 0, 0, w, h);
+
+  ctx.restore();
+
+  return canvas.toDataURL('image/jpeg', .92);
+}
+
+function updateProgress() {
+
+  progressDots.forEach((dot, i) => {
+    dot.classList.toggle('done', i < photos.length);
+  });
+
+}
+
+function renderStrip() {
+
+  framesEl.innerHTML = '';
+
+  photos.forEach(src => {
+
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = 'Photo booth frame';
+
+    framesEl.appendChild(frame);
+    frame.appendChild(img);
+
+  });
+
+  const strip = document.getElementById('strip');
+
+  strip.style.background =
+    selectedStyle === 'pink' ? '#f4dce5' :
+    selectedStyle === 'vintage' ? '#d8c6a6' :
+    selectedStyle === 'color' ? '#d7e5ef' :
+    '#090909';
+
+  strip.querySelector('.strip-footer').style.color =
+    selectedStyle === 'pink' ||
+    selectedStyle === 'vintage' ||
+    selectedStyle === 'color'
+      ? '#171717'
+      : '#eee';
+}
+
+async function startSession() {
+
+  if (busy) return;
+
+  busy = true;
+  startBtn.disabled = true;
+
+  photos = [];
+  updateProgress();
+
+  result.style.display = 'none';
+
+  try {
+
+    if (!stream) {
+      await openCamera();
+    }
+
+    statusEl.textContent = 'Get ready…';
+
+    for (let i = 0; i < 4; i++) {
+
+      statusEl.textContent = `PHOTO ${i + 1} OF 4`;
+
+      await countdown(
+        Number(document.getElementById('timerChoice').value)
+      );
+
+      photos.push(capture());
+      updateProgress();
+
+      if (i < 3) {
+        await wait(1100);
+      }
+    }
+
+    renderStrip();
+
+    result.style.display = 'block';
+
+    statusEl.textContent = 'Your photo strip is ready ♡';
+
+    result.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+
+  } catch (e) {
+
+    statusEl.textContent =
+      e.name === 'NotAllowedError'
+        ? 'Camera permission was not granted. Allow camera access in your browser settings.'
+        : e.message;
+
+  } finally {
+
+    busy = false;
+    startBtn.disabled = false;
+    countdownEl.style.display = 'none';
+
+  }
+}
+
+startBtn.addEventListener('click', startSession);
+
+document.getElementById('retakeBtn')
+  .addEventListener('click', () => {
+
+    result.style.display = 'none';
+    photos = [];
+    updateProgress();
+
+    statusEl.textContent = 'Ready for another session.';
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
+  });
+
+document.getElementById('saveBtn')
+  .addEventListener('click', () => {
+
+    const strip = document.getElementById('strip');
+    const images = [...strip.querySelectorAll('img')];
+
+    const width = 720;
+    const frameH = 540;
+    const gap = 18;
+    const pad = 24;
+    const footerH = 70;
+
+    const out = document.createElement('canvas');
+
+    out.width = width;
+    out.height = pad * 2 + frameH * 4 + gap * 3 + footerH;
+
+    const c = out.getContext('2d');
+
+    const bg =
+      selectedStyle === 'pink' ? '#f4dce5' :
+      selectedStyle === 'vintage' ? '#d8c6a6' :
+      selectedStyle === 'color' ? '#d7e5ef' :
+      '#090909';
+
+    c.fillStyle = bg;
+    c.fillRect(0, 0, out.width, out.height);
+
+    let loaded = 0;
+
+    images.forEach((img, i) => {
+
+      const im = new Image();
+
+      im.onload = () => {
+
+        const y = pad + i * (frameH + gap);
+
+        const targetW = width - 2 * pad;
+        const targetH = frameH;
+
+        const ratio = Math.max(
+          targetW / im.naturalWidth,
+          targetH / im.naturalHeight
+        );
+
+        const sw = targetW / ratio;
+        const sh = targetH / ratio;
+
+        const sx = (im.naturalWidth - sw) / 2;
+        const sy = (im.naturalHeight - sh) / 2;
+
+        c.drawImage(
+          im,
+          sx, sy, sw, sh,
+          pad, y, targetW, targetH
+        );
+
+        loaded++;
+
+        if (loaded === images.length) {
+
+          c.fillStyle =
+            selectedStyle === 'mono' ? '#eee' : '#171717';
+
+          c.font = '22px Arial';
+          c.textAlign = 'center';
+
+          c.fillText(
+            '4 CUTS STUDIO',
+            width / 2,
+            out.height - 28
+          );
+
+          const a = document.createElement('a');
+
+          a.href = out.toDataURL('image/jpeg', .95);
+          a.download = '4-cuts-studio.jpg';
+          a.click();
+
+        }
+
+      };
+
+      im.src = img.src;
+
+    });
+
+  });
+
+window.addEventListener('pagehide', () => {
+
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+  }
+
+});
+
+</script>
+</body>
+</html>
