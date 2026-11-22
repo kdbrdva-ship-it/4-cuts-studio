@@ -150,8 +150,6 @@ START PHOTO SESSION
 </button>
 </div>
 
-<!-- НАСТРОЙКИ ДО И ПОСЛЕ СЪЁМКИ -->
-
 <div class="adjustments">
 
 <h2>PHOTO ADJUSTMENTS</h2>
@@ -166,8 +164,7 @@ LIVE PREVIEW · SEE THE DIFFERENCE ♡<br>
   <label for="contrast">CONTRAST</label>
   <span id="contrastValue">100%</span>
  </div>
- <input type="range" id="contrast"
- min="0" max="250" value="100">
+ <input type="range" id="contrast" min="0" max="250" value="100">
 </div>
 
 <div class="control">
@@ -175,8 +172,7 @@ LIVE PREVIEW · SEE THE DIFFERENCE ♡<br>
   <label for="brightness">BRIGHTNESS</label>
   <span id="brightnessValue">100%</span>
  </div>
- <input type="range" id="brightness"
- min="30" max="180" value="100">
+ <input type="range" id="brightness" min="30" max="180" value="100">
 </div>
 
 <div class="control">
@@ -184,8 +180,7 @@ LIVE PREVIEW · SEE THE DIFFERENCE ♡<br>
   <label for="saturation">SATURATION</label>
   <span id="saturationValue">100%</span>
  </div>
- <input type="range" id="saturation"
- min="0" max="250" value="100">
+ <input type="range" id="saturation" min="0" max="250" value="100">
 </div>
 
 <div class="control">
@@ -193,8 +188,7 @@ LIVE PREVIEW · SEE THE DIFFERENCE ♡<br>
   <label for="grain">FILM GRAIN</label>
   <span id="grainValue">0%</span>
  </div>
- <input type="range" id="grain"
- min="0" max="100" value="0">
+ <input type="range" id="grain" min="0" max="100" value="0">
 </div>
 
 <div class="control">
@@ -202,8 +196,7 @@ LIVE PREVIEW · SEE THE DIFFERENCE ♡<br>
   <label for="vignette">VIGNETTE</label>
   <span id="vignetteValue">0%</span>
  </div>
- <input type="range" id="vignette"
- min="0" max="100" value="0">
+ <input type="range" id="vignette" min="0" max="100" value="0">
 </div>
 
 <button class="reset-btn" onclick="resetAdjustments()">
@@ -296,7 +289,7 @@ const themeSettings={
  color:{saturation:140}
 };
 
-// ШУМ ДЛЯ ПЛЁНОЧНОЙ ЗЕРНИСТОСТИ
+// ТЕКСТУРА ПЛЁНОЧНОГО ЗЕРНА
 
 const noiseCanvas=document.createElement('canvas');
 noiseCanvas.width=128;
@@ -315,7 +308,7 @@ for(let i=0;i<noiseImage.data.length;i+=4){
 
 noiseCtx.putImageData(noiseImage,0,0);
 
-// ВЫБОР ФИЛЬТРА
+// ВЫБОР СТИЛЯ
 
 function chooseTheme(btn){
  if(busy)return;
@@ -377,7 +370,7 @@ async function countdown(){
  count.textContent='';
 }
 
-// ПОЛУЧЕНИЕ ТЕКУЩИХ НАСТРОЕК
+// ПОЛУЧЕНИЕ НАСТРОЕК
 
 function getFilterSettings(){
  const theme=themeSettings[selected];
@@ -391,7 +384,7 @@ function getFilterSettings(){
  };
 }
 
-// ПРЕДПРОСМОТР КАМЕРЫ В РЕАЛЬНОМ ВРЕМЕНИ
+// ПРЕДПРОСМОТР КАМЕРЫ
 
 function updatePreview(){
  const s=getFilterSettings();
@@ -404,7 +397,7 @@ function updatePreview(){
  drawOverlay(previewOverlay,video.videoWidth||480,video.videoHeight||600);
 }
 
-// ВИЗУАЛЬНЫЕ ЭФФЕКТЫ: ЗЕРНО И ВИНЬЕТКА
+// ЗЕРНО И ВИНЬЕТКА ДЛЯ ПРЕДПРОСМОТРА
 
 function drawOverlay(canvas,w,h){
  canvas.width=w;
@@ -430,8 +423,7 @@ function drawOverlay(canvas,w,h){
   x.globalAlpha=s.grain/100*0.25;
   x.globalCompositeOperation='soft-light';
 
-  const pattern=x.createPattern(noiseCanvas,'repeat');
-  x.fillStyle=pattern;
+  x.fillStyle=x.createPattern(noiseCanvas,'repeat');
   x.fillRect(0,0,w,h);
 
   x.globalAlpha=1;
@@ -463,7 +455,8 @@ Object.values(controls).forEach(input=>{
 
 function resetAdjustments(){
  Object.keys(controls).forEach(key=>{
-  controls[key].value=key==='contrast'||key==='brightness'||key==='saturation'?100:0;
+  controls[key].value=
+   key==='contrast'||key==='brightness'||key==='saturation'?100:0;
  });
 
  updateAdjustments();
@@ -471,7 +464,7 @@ function resetAdjustments(){
  statusText.textContent='Настройки сброшены ♡';
 }
 
-// СЪЁМКА ОРИГИНАЛЬНОГО КАДРА
+// СЪЁМКА ОРИГИНАЛА
 
 function capture(){
  const c=document.createElement('canvas');
@@ -536,6 +529,7 @@ async function startSession(){
   statusText.textContent='Готово! Теперь можешь редактировать фото ♡';
 
  }catch(e){
+  console.error(e);
   statusText.textContent='Что-то пошло не так. Попробуй ещё раз.';
  }
 
@@ -543,24 +537,81 @@ async function startSession(){
  shoot.disabled=false;
 }
 
-// РИСУЕМ ОБРАБОТАННОЕ ФОТО
+// ГЛАВНОЕ ИСПРАВЛЕНИЕ:
+// ОБРАБОТКА КАЖДОГО ПИКСЕЛЯ ФОТОГРАФИИ
 
 function drawProcessed(target,source){
- const x=target.getContext('2d');
+
+ const x=target.getContext('2d',{willReadFrequently:true});
  const s=getFilterSettings();
+
+ target.width=PHOTO_W;
+ target.height=PHOTO_H;
 
  x.clearRect(0,0,PHOTO_W,PHOTO_H);
 
- x.save();
-
- x.filter=
-  `contrast(${s.contrast}%) `+
-  `brightness(${s.brightness}%) `+
-  `saturate(${s.saturation}%)`;
+ // Сначала рисуем оригинал без CSS-фильтров
 
  x.drawImage(source,0,0,PHOTO_W,PHOTO_H);
 
- x.restore();
+ // Получаем пиксели изображения
+
+ const image=x.getImageData(0,0,PHOTO_W,PHOTO_H);
+ const pixels=image.data;
+
+ const brightness=s.brightness/100;
+ const contrast=s.contrast/100;
+ const saturation=s.saturation/100;
+ const grain=s.grain/100;
+
+ // Контраст, яркость, насыщенность и зерно
+
+ for(let i=0;i<pixels.length;i+=4){
+
+  let r=pixels[i];
+  let g=pixels[i+1];
+  let b=pixels[i+2];
+
+  // Яркость
+
+  r*=brightness;
+  g*=brightness;
+  b*=brightness;
+
+  // Контраст
+
+  r=(r-128)*contrast+128;
+  g=(g-128)*contrast+128;
+  b=(b-128)*contrast+128;
+
+  // Насыщенность
+
+  const gray=0.299*r+0.587*g+0.114*b;
+
+  r=gray+(r-gray)*saturation;
+  g=gray+(g-gray)*saturation;
+  b=gray+(b-gray)*saturation;
+
+  // Плёночное зерно
+
+  if(grain>0){
+   const noise=(Math.random()-0.5)*grain*75;
+
+   r+=noise;
+   g+=noise;
+   b+=noise;
+  }
+
+  // Ограничиваем значения RGB
+
+  pixels[i]=Math.max(0,Math.min(255,r));
+  pixels[i+1]=Math.max(0,Math.min(255,g));
+  pixels[i+2]=Math.max(0,Math.min(255,b));
+ }
+
+ // Возвращаем обработанные пиксели на холст
+
+ x.putImageData(image,0,0);
 
  // ДЕКОРАТИВНЫЕ РАМКИ
 
@@ -604,7 +655,7 @@ function drawProcessed(target,source){
   x.fillText('✧',PHOTO_W-130,PHOTO_H-45);
  }
 
- // ВИНЬЕТКА
+ // ВИНЬЕТКА ПОВЕРХ ФОТО
 
  if(s.vignette>0){
   const gradient=x.createRadialGradient(
@@ -617,19 +668,6 @@ function drawProcessed(target,source){
 
   x.fillStyle=gradient;
   x.fillRect(0,0,PHOTO_W,PHOTO_H);
- }
-
- // ЗЕРНИСТОСТЬ
-
- if(s.grain>0){
-  x.save();
-  x.globalAlpha=s.grain/100*0.25;
-  x.globalCompositeOperation='soft-light';
-
-  x.fillStyle=x.createPattern(noiseCanvas,'repeat');
-  x.fillRect(0,0,PHOTO_W,PHOTO_H);
-
-  x.restore();
  }
 }
 
@@ -657,6 +695,7 @@ async function retake(index){
   statusText.textContent='PHOTO '+(index+1)+' обновлено! ♡';
 
  }catch(e){
+  console.error(e);
   statusText.textContent='Не удалось переснять кадр.';
  }
 
@@ -668,22 +707,26 @@ async function retake(index){
  });
 }
 
-// ОБНОВЛЕНИЕ КАДРОВ
+// ОБНОВЛЕНИЕ ВСЕХ ЧЕТЫРЁХ ФОТО
 
 function renderAll(){
+
+ if(photos.length!==4)return;
+
  photos.forEach((photo,i)=>{
   const c=document.getElementById('frame'+i);
-  c.width=PHOTO_W;
-  c.height=PHOTO_H;
   drawProcessed(c,photo);
  });
 
  renderStrip();
 }
 
-// ФОТОПОЛОСКА
+// СОЗДАНИЕ ФОТОПОЛОСКИ
 
 function renderStrip(){
+
+ if(photos.length!==4)return;
+
  const w=1140;
  const margin=30;
  const photoHeight=1350;
@@ -753,11 +796,23 @@ function renderStrip(){
  out.fillText('THANK YOU FOR THE MEMORIES',w/2,h-55);
 }
 
-// СОЗДАНИЕ JPG
+// ПЕРЕД СОХРАНЕНИЕМ ПЕРЕРИСОВЫВАЕМ ВСЁ
 
 function createImageFile(){
+
  return new Promise((resolve,reject)=>{
+
+  if(photos.length!==4){
+   reject(new Error('Нет готовой фотосессии'));
+   return;
+  }
+
+  // Гарантируем актуальные настройки на итоговом изображении
+
+  renderAll();
+
   output.toBlob(blob=>{
+
    if(blob){
     resolve(new File(
      [blob],
@@ -767,18 +822,24 @@ function createImageFile(){
    }else{
     reject(new Error('Не удалось создать изображение'));
    }
+
   },'image/jpeg',0.98);
  });
 }
 
-// СОХРАНЕНИЕ
+// СОХРАНЕНИЕ В ГАЛЕРЕЮ
 
 async function saveToGallery(){
+
  try{
+
+  statusText.textContent='Подготавливаем фотографию...';
+
   const file=await createImageFile();
 
   if(navigator.share&&navigator.canShare&&
      navigator.canShare({files:[file]})){
+
    await navigator.share({
     files:[file],
     title:'4 CUTS STUDIO',
@@ -786,10 +847,17 @@ async function saveToGallery(){
    });
 
    statusText.textContent='Выбери «Сохранить изображение» в меню iPhone ♡';
+
   }else{
+
    openImageForSaving(file);
+
   }
+
  }catch(e){
+
+  console.error(e);
+
   if(e.name==='AbortError'){
    statusText.textContent='Сохранение отменено.';
   }else{
@@ -798,31 +866,47 @@ async function saveToGallery(){
  }
 }
 
-// ОТПРАВКА
+// ОТПРАВКА ФОТО
 
 async function sharePhoto(){
+
  try{
+
+  statusText.textContent='Подготавливаем фотографию...';
+
   const file=await createImageFile();
 
   if(navigator.share&&navigator.canShare&&
      navigator.canShare({files:[file]})){
+
    await navigator.share({
     files:[file],
     title:'4 CUTS STUDIO',
     text:'My four cuts ♡'
    });
+
   }else{
+
    openImageForSaving(file);
+
    statusText.textContent='Изображение открыто.';
+
   }
+
  }catch(e){
+
+  console.error(e);
+
   if(e.name!=='AbortError'){
    statusText.textContent='Не удалось открыть меню отправки.';
   }
  }
 }
 
+// ЗАПАСНОЙ СПОСОБ СОХРАНЕНИЯ
+
 function openImageForSaving(file){
+
  const url=URL.createObjectURL(file);
  const newTab=window.open(url,'_blank');
 
@@ -839,10 +923,13 @@ function openImageForSaving(file){
 // НОВАЯ СЪЁМКА
 
 function again(){
+
  if(busy)return;
 
  photos=[];
+
  document.getElementById('result').classList.add('hidden');
+
  statusText.textContent='Готова к новой съёмке!';
  count.textContent='';
 }
