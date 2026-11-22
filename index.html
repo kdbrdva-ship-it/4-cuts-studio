@@ -7,25 +7,46 @@
 <title>4 CUTS STUDIO</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif;text-align:center;padding:25px 15px}
+body{
+ margin:0;background:#090909;color:white;
+ font-family:Arial,sans-serif;text-align:center;
+ padding:25px 15px
+}
 h1{letter-spacing:5px;font-size:27px;margin:15px 0 8px}
 .sub{color:#aaa;font-size:12px;letter-spacing:3px;margin-bottom:30px}
 h2{font-size:17px;font-weight:500;margin:25px 0 15px}
-.themes{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:430px;margin:auto}
-.theme{background:#181818;color:white;border:1px solid #333;border-radius:12px;padding:15px 8px;cursor:pointer}
+.themes{
+ display:grid;grid-template-columns:1fr 1fr;
+ gap:12px;max-width:430px;margin:auto
+}
+.theme{
+ background:#181818;color:white;border:1px solid #333;
+ border-radius:12px;padding:15px 8px;cursor:pointer
+}
 .theme.active{border:2px solid white;background:#292929}
 .theme b{display:block;font-size:14px;margin-bottom:6px}
 .theme small{color:#aaa;font-size:11px}
-button{border:0;border-radius:30px;padding:14px 24px;background:white;color:#111;font-weight:bold;font-size:13px;letter-spacing:1px;cursor:pointer;margin:8px}
+button{
+ border:0;border-radius:30px;padding:14px 24px;
+ background:white;color:#111;font-weight:bold;
+ font-size:13px;letter-spacing:1px;cursor:pointer;margin:8px
+}
 button:disabled{opacity:.4}
 .camera{max-width:420px;margin:20px auto}
-video{width:100%;border-radius:12px;background:#222;transform:scaleX(-1)}
+video{
+ width:100%;aspect-ratio:4/5;object-fit:cover;
+ border-radius:12px;background:#222;
+ transform:scaleX(-1)
+}
 #status{color:#bbb;font-size:13px;min-height:22px;margin:12px}
 #count{font-size:45px;font-weight:bold;margin:10px}
 #result{margin:25px auto;max-width:360px}
 canvas{width:100%;height:auto;border-radius:4px}
 .hidden{display:none}
-.note{font-size:11px;color:#777;line-height:1.6;margin:25px auto;max-width:330px}
+.note{
+ font-size:11px;color:#777;line-height:1.6;
+ margin:25px auto;max-width:330px
+}
 </style>
 </head>
 <body>
@@ -34,6 +55,7 @@ canvas{width:100%;height:auto;border-radius:4px}
 <div class="sub">YOUR MOMENT · YOUR FOUR CUTS</div>
 
 <h2>CHOOSE YOUR MOOD</h2>
+
 <div class="themes">
 <button class="theme active" data-theme="bw" onclick="chooseTheme(this)">
 <b>CLASSIC B&W</b><small>Timeless black & white</small>
@@ -66,7 +88,10 @@ canvas{width:100%;height:auto;border-radius:4px}
 <button onclick="again()">TAKE AGAIN</button>
 </div>
 
-<div class="note">4 CUTS STUDIO · CAPTURE YOUR MOMENT<br>Made with love ♡</div>
+<div class="note">
+4 CUTS STUDIO · CAPTURE YOUR MOMENT<br>
+Made with love ♡
+</div>
 
 <script>
 const video=document.getElementById('video');
@@ -79,6 +104,10 @@ const out=output.getContext('2d');
 let stream=null;
 let photos=[];
 let selected='bw';
+let busy=false;
+
+const PHOTO_W=1080;
+const PHOTO_H=1350;
 
 function chooseTheme(btn){
  document.querySelectorAll('.theme').forEach(x=>x.classList.remove('active'));
@@ -89,59 +118,99 @@ function chooseTheme(btn){
 
 async function startCamera(){
  try{
-  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+
   stream=await navigator.mediaDevices.getUserMedia({
-   video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},
+   video:{
+    facingMode:'user',
+    width:{ideal:1920},
+    height:{ideal:1440},
+    aspectRatio:{ideal:0.8}
+   },
    audio:false
   });
+
   video.srcObject=stream;
+  await video.play();
+
   shoot.disabled=false;
   statusText.textContent='Камера готова! Нажми START PHOTO SESSION.';
  }catch(e){
-  statusText.textContent='Не удалось открыть камеру. Разреши доступ к камере в браузере.';
+  statusText.textContent='Не удалось открыть камеру. Разреши доступ в браузере.';
  }
 }
 
-function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function wait(ms){
+ return new Promise(r=>setTimeout(r,ms));
+}
 
 async function startSession(){
- if(!stream)return;
+ if(!stream||busy)return;
+
+ busy=true;
  shoot.disabled=true;
  photos=[];
+
  document.getElementById('result').classList.add('hidden');
 
  for(let i=0;i<4;i++){
   statusText.textContent='PHOTO '+(i+1)+' OF 4';
+
   for(let n=3;n>0;n--){
    count.textContent=n;
    await wait(1000);
   }
+
   count.textContent='✦';
   await wait(300);
+
   photos.push(capture());
   count.textContent='';
   await wait(500);
  }
+
  renderStrip();
+
  document.getElementById('result').classList.remove('hidden');
  statusText.textContent='Готово! Твоя фотополоска готова ♡';
+
+ busy=false;
  shoot.disabled=false;
 }
 
 function capture(){
  const c=document.createElement('canvas');
- c.width=600;
- c.height=750;
- const x=c.getContext('2d');
+ c.width=PHOTO_W;
+ c.height=PHOTO_H;
 
+ const x=c.getContext('2d',{alpha:false});
+
+ const sw=video.videoWidth;
+ const sh=video.videoHeight;
+
+ // Кадрирование без растягивания изображения
+ const targetRatio=PHOTO_W/PHOTO_H;
+ const sourceRatio=sw/sh;
+
+ let sx=0,sy=0,sWidth=sw,sHeight=sh;
+
+ if(sourceRatio>targetRatio){
+  sWidth=sh*targetRatio;
+  sx=(sw-sWidth)/2;
+ }else{
+  sHeight=sw/targetRatio;
+  sy=(sh-sHeight)/2;
+ }
+
+ // Зеркальное отображение как в селфи
  x.save();
- if(selected==='bw') x.filter='grayscale(1) contrast(1.12)';
- if(selected==='pink') x.filter='sepia(.15) saturate(1.25) hue-rotate(315deg) brightness(1.06)';
- if(selected==='vintage') x.filter='sepia(.35) saturate(.8) contrast(.9) brightness(1.05)';
- if(selected==='color') x.filter='saturate(1.5) contrast(1.05)';
- x.translate(600,0);
+ x.translate(PHOTO_W,0);
  x.scale(-1,1);
- x.drawImage(video,0,0,600,750);
+ x.drawImage(
+  video,
+  sx,sy,sWidth,sHeight,
+  0,0,PHOTO_W,PHOTO_H
+ );
  x.restore();
 
  decoratePhoto(x);
@@ -149,39 +218,65 @@ function capture(){
 }
 
 function decoratePhoto(x){
- if(selected==='pink'){
-  x.fillStyle='rgba(255,190,215,.12)';
-  x.fillRect(0,0,600,750);
-  x.font='65px Arial';
-  x.fillStyle='white';
-  x.fillText('♡',20,75);
-  x.fillText('♡',510,720);
-  x.font='48px Arial';
-  x.fillText('🎀',270,65);
- }
- if(selected==='vintage'){
-  x.fillStyle='rgba(180,120,55,.12)';
-  x.fillRect(0,0,600,750);
-  x.strokeStyle='rgba(255,235,190,.65)';
-  x.lineWidth=12;
-  x.strokeRect(12,12,576,726);
- }
- if(selected==='color'){
-  x.font='48px Arial';
-  x.fillStyle='white';
-  x.fillText('✦',25,65);
-  x.fillText('✧',520,710);
- }
  if(selected==='bw'){
+  x.globalCompositeOperation='saturation';
+  x.fillStyle='rgba(0,0,0,1)';
+  x.fillRect(0,0,PHOTO_W,PHOTO_H);
+  x.globalCompositeOperation='source-over';
+
+  x.fillStyle='rgba(0,0,0,.08)';
+  x.fillRect(0,0,PHOTO_W,PHOTO_H);
+
   x.strokeStyle='white';
-  x.lineWidth=8;
-  x.strokeRect(8,8,584,734);
+  x.lineWidth=12;
+  x.strokeRect(10,10,PHOTO_W-20,PHOTO_H-20);
+ }
+
+ if(selected==='pink'){
+  x.fillStyle='rgba(255,190,215,.13)';
+  x.fillRect(0,0,PHOTO_W,PHOTO_H);
+
+  x.font='110px Arial';
+  x.fillStyle='white';
+  x.fillText('♡',35,130);
+  x.fillText('♡',PHOTO_W-135,PHOTO_H-35);
+
+  x.font='85px Arial';
+  x.textAlign='center';
+  x.fillText('🎀',PHOTO_W/2,105);
+
+  x.strokeStyle='rgba(255,255,255,.85)';
+  x.lineWidth=12;
+  x.strokeRect(12,12,PHOTO_W-24,PHOTO_H-24);
+ }
+
+ if(selected==='vintage'){
+  x.fillStyle='rgba(180,120,55,.13)';
+  x.fillRect(0,0,PHOTO_W,PHOTO_H);
+
+  x.strokeStyle='rgba(255,235,190,.75)';
+  x.lineWidth=18;
+  x.strokeRect(18,18,PHOTO_W-36,PHOTO_H-36);
+ }
+
+ if(selected==='color'){
+  x.font='90px Arial';
+  x.fillStyle='white';
+  x.fillText('✦',35,120);
+  x.fillText('✧',PHOTO_W-130,PHOTO_H-45);
  }
 }
 
 function renderStrip(){
- const w=660;
- const h=4*810+180;
+ const w=1140;
+ const margin=30;
+ const photoHeight=1350;
+ const gap=35;
+ const top=190;
+ const bottom=120;
+
+ const h=top+4*(photoHeight+gap)+bottom;
+
  output.width=w;
  output.height=h;
 
@@ -198,50 +293,54 @@ function renderStrip(){
 
  out.textAlign='center';
  out.fillStyle=ink;
- out.font='bold 32px Arial';
- out.fillText('4 CUTS STUDIO',w/2,65);
+ out.font='bold 42px Arial';
+ out.fillText('4 CUTS STUDIO',w/2,75);
 
- out.font='18px Arial';
- const subtitle={
+ out.font='23px Arial';
+
+ const subtitles={
   bw:'CLASSIC BLACK & WHITE',
   pink:'A LITTLE BIT OF LOVE ♡',
   vintage:'MEMORIES ON FILM',
   color:'GOOD TIMES ONLY ✦'
  };
- out.fillText(subtitle[selected],w/2,105);
+
+ out.fillText(subtitles[selected],w/2,125);
 
  photos.forEach((photo,i)=>{
-  const y=135+i*810;
-  out.drawImage(photo,35,y,590,738);
+  const y=top+i*(photoHeight+gap);
+
+  out.drawImage(photo,margin,y,PHOTO_W,PHOTO_H);
 
   out.strokeStyle=ink;
-  out.lineWidth=selected==='pink'?5:3;
-  out.strokeRect(35,y,590,738);
+  out.lineWidth=selected==='pink'?7:4;
+  out.strokeRect(margin,y,PHOTO_W,photoHeight);
 
   if(selected==='pink'){
    out.fillStyle='#bd7390';
-   out.font='32px Arial';
+   out.font='55px Arial';
    out.textAlign='right';
-   out.fillText('♡',610,y+38);
+   out.fillText('♡',w-45,y+65);
   }
+
   if(selected==='vintage'){
    out.fillStyle='#755536';
-   out.font='15px Arial';
+   out.font='20px Arial';
    out.textAlign='left';
-   out.fillText('FILM 04  ·  NO.'+(i+1),45,y+725);
+   out.fillText('FILM 04 · NO.'+(i+1),margin+20,y+photoHeight-25);
   }
  });
 
  out.textAlign='center';
  out.fillStyle=ink;
- out.font='20px Arial';
+ out.font='23px Arial';
  out.fillText('THANK YOU FOR THE MEMORIES',w/2,h-55);
 }
 
 function downloadPhoto(){
  const link=document.createElement('a');
  link.download='4-cuts-studio.jpg';
- link.href=output.toDataURL('image/jpeg',.95);
+ link.href=output.toDataURL('image/jpeg',0.98);
  link.click();
 }
 
