@@ -1,162 +1,119 @@
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#090909">
 <title>4 CUTS STUDIO</title>
 
 <style>
-:root {
-  --bg: #090909;
-  --panel: #151515;
-  --line: #303030;
-  --muted: #a5a5a5;
-  --white: #f5f2ee;
-  --accent: #d8c6b4;
-}
-
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--white);
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100vh;
+  background: #090909;
+  color: #f5f2ee;
+  font-family: Arial, sans-serif;
 }
 
-button, select { font: inherit; }
-
 .wrap {
-  width: min(100%, 760px);
+  max-width: 720px;
   margin: auto;
-  padding: 28px 18px 48px;
+  padding: 30px 18px 50px;
 }
 
 header {
   text-align: center;
-  padding: 18px 0 28px;
+  padding: 25px 0;
 }
 
-.brand {
-  font-size: clamp(30px, 8vw, 48px);
-  letter-spacing: .16em;
+h1 {
+  font-size: clamp(27px, 7vw, 45px);
   font-weight: 300;
+  letter-spacing: .15em;
   margin: 0;
 }
 
 .tag {
+  color: #999;
   font-size: 10px;
-  letter-spacing: .34em;
-  color: var(--muted);
+  letter-spacing: .3em;
   margin-top: 12px;
 }
 
-.rule {
+.line {
   height: 1px;
-  background: var(--line);
-  margin: 0 auto 26px;
-  max-width: 520px;
+  background: #333;
+  margin: 15px 0 30px;
 }
 
 h2 {
-  font-size: 13px;
-  letter-spacing: .18em;
-  font-weight: 500;
-  text-transform: uppercase;
-  margin: 0 0 14px;
-}
-
-p.note {
   font-size: 12px;
-  color: var(--muted);
-  line-height: 1.55;
+  letter-spacing: .17em;
+  font-weight: 500;
+  margin-bottom: 15px;
 }
 
 .styles {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 25px;
 }
 
 .style {
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--white);
-  padding: 13px;
+  background: #151515;
+  border: 1px solid #333;
+  color: white;
+  padding: 17px 10px;
   text-align: left;
+  min-height: 75px;
   cursor: pointer;
-  min-height: 76px;
 }
 
 .style.active {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: #d8c6b4;
 }
 
 .style strong {
   display: block;
-  font-size: 12px;
-  letter-spacing: .1em;
-  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: .12em;
+  margin-bottom: 7px;
 }
 
 .style small {
-  font-size: 11px;
-  color: var(--muted);
+  color: #999;
+  font-size: 10px;
 }
 
 .controls {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  margin: 12px 0 18px;
+  margin: 15px 0;
 }
 
-select, .secondary {
-  background: #171717;
-  color: var(--white);
-  border: 1px solid var(--line);
-  padding: 12px 13px;
-  min-height: 44px;
-}
-
-button.primary {
-  width: 100%;
-  border: 0;
-  background: var(--white);
-  color: #111;
-  padding: 15px 18px;
-  letter-spacing: .13em;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-button.secondary {
-  cursor: pointer;
+select {
   flex: 1;
-}
-
-button:disabled {
-  opacity: .45;
-  cursor: not-allowed;
+  min-width: 0;
+  background: #171717;
+  color: white;
+  border: 1px solid #333;
+  padding: 13px 8px;
+  font-size: 12px;
 }
 
 .camera-box {
   background: #111;
-  border: 1px solid var(--line);
   padding: 10px;
-  margin: 16px 0;
+  border: 1px solid #333;
+  margin: 15px 0;
 }
 
 .camera-stage {
-  position: relative;
   background: #222;
-  aspect-ratio: 4/5;
+  aspect-ratio: 4 / 5;
+  position: relative;
   overflow: hidden;
   display: grid;
   place-items: center;
@@ -166,15 +123,6 @@ video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1);
-  display: none;
-}
-
-#countdown {
-  position: absolute;
-  font-size: 76px;
-  font-weight: 200;
-  text-shadow: 0 2px 18px #000;
   display: none;
 }
 
@@ -182,107 +130,144 @@ video {
   color: #aaa;
   font-size: 12px;
   text-align: center;
-  padding: 25px;
-  line-height: 1.6;
+  line-height: 1.8;
+}
+
+#countdown {
+  position: absolute;
+  font-size: 85px;
+  color: white;
+  text-shadow: 0 0 20px black;
+  display: none;
 }
 
 .status {
+  color: #aaa;
   font-size: 11px;
-  color: var(--muted);
   text-align: center;
-  margin: 12px 0 0;
-  min-height: 16px;
+  padding: 12px 0 3px;
+  min-height: 25px;
+}
+
+.primary {
+  width: 100%;
+  padding: 16px;
+  background: #f5f2ee;
+  color: #111;
+  border: none;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: .15em;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .5;
 }
 
 .progress {
   display: flex;
-  gap: 7px;
   justify-content: center;
-  margin: 15px 0;
+  gap: 9px;
+  margin: 20px;
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  border: 1px solid #777;
+  border: 1px solid #888;
   border-radius: 50%;
 }
 
 .dot.done {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: #d8c6b4;
+  border-color: #d8c6b4;
+}
+
+.note {
+  color: #888;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
 .result {
   display: none;
-  margin-top: 30px;
+  margin-top: 35px;
 }
 
 .strip-wrap {
   display: flex;
   justify-content: center;
-  background: #111;
+  background: #151515;
+  border: 1px solid #333;
   padding: 20px 10px;
-  border: 1px solid var(--line);
 }
 
 #strip {
-  width: min(100%, 300px);
-  background: #090909;
+  width: min(100%, 290px);
   padding: 9px 9px 15px;
   display: flex;
   flex-direction: column;
   gap: 7px;
+  background: #090909;
 }
 
 .frame {
   width: 100%;
-  aspect-ratio: 4/3;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: #222;
-  position: relative;
 }
 
 .frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-.strip-footer {
+.footer-strip {
   text-align: center;
   font-size: 9px;
   letter-spacing: .3em;
-  color: #ddd;
-  padding-top: 7px;
+  padding: 8px;
 }
 
-.result-actions {
+.actions {
   display: flex;
-  gap: 9px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 15px;
 }
 
-.result-actions button {
+.actions button {
   flex: 1;
+  padding: 14px 5px;
+  font-size: 10px;
+  letter-spacing: .08em;
+  cursor: pointer;
 }
 
-.foot {
+.secondary {
+  background: #171717;
+  color: white;
+  border: 1px solid #444;
+}
+
+footer {
   text-align: center;
   color: #666;
   font-size: 10px;
-  letter-spacing: .12em;
-  margin-top: 42px;
+  letter-spacing: .2em;
+  margin-top: 45px;
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
-@media(min-width:600px) {
+@media (min-width: 600px) {
   .styles {
     grid-template-columns: repeat(4, 1fr);
   }
-  .style { min-height: 88px; }
 }
 </style>
 </head>
@@ -292,16 +277,17 @@ video {
 <div class="wrap">
 
 <header>
-  <h1 class="brand">4 CUTS STUDIO</h1>
+  <h1>4 CUTS STUDIO</h1>
   <div class="tag">YOUR MOMENT · YOUR FOUR CUTS</div>
 </header>
 
-<div class="rule"></div>
+<div class="line"></div>
 
 <section>
-  <h2>01 — Choose your mood</h2>
+  <h2>01 — CHOOSE YOUR MOOD</h2>
 
   <div class="styles">
+
     <button class="style active" data-style="mono">
       <strong>CLASSIC B&W</strong>
       <small>Black & white film</small>
@@ -319,21 +305,24 @@ video {
 
     <button class="style" data-style="color">
       <strong>COLORFUL</strong>
-      <small>True colors</small>
+      <small>Natural colors</small>
     </button>
+
   </div>
 </section>
 
+<br>
+
 <section>
-  <h2>02 — Set up your session</h2>
+  <h2>02 — SET UP YOUR SESSION</h2>
 
   <div class="controls">
-    <select id="cameraChoice" aria-label="Camera">
+    <select id="cameraChoice">
       <option value="user">Front camera</option>
       <option value="environment">Back camera</option>
     </select>
 
-    <select id="timerChoice" aria-label="Countdown">
+    <select id="timerChoice">
       <option value="3">3 sec countdown</option>
       <option value="5">5 sec countdown</option>
       <option value="0">No countdown</option>
@@ -342,15 +331,17 @@ video {
 
   <div class="camera-box">
     <div class="camera-stage">
+
       <video id="video" autoplay playsinline muted></video>
 
       <div id="placeholder">
         YOUR CAMERA PREVIEW
         <br><br>
-        Allow camera access to begin
+        ALLOW CAMERA ACCESS TO BEGIN
       </div>
 
       <div id="countdown"></div>
+
     </div>
 
     <div class="status" id="status">
@@ -362,7 +353,7 @@ video {
     START PHOTO SESSION
   </button>
 
-  <div class="progress" id="progress">
+  <div class="progress">
     <span class="dot"></span>
     <span class="dot"></span>
     <span class="dot"></span>
@@ -370,25 +361,26 @@ video {
   </div>
 
   <p class="note">
-    The studio takes four pictures with a short pause between each shot.
-    Use good, even lighting and place your phone securely.
+    Four pictures. One beautiful memory.
+    Get ready and enjoy your photo session.
   </p>
+
 </section>
 
 <section class="result" id="result">
 
-  <div class="rule"></div>
+  <div class="line"></div>
 
-  <h2>03 — Your photo strip</h2>
+  <h2>03 — YOUR PHOTO STRIP</h2>
 
   <div class="strip-wrap">
     <div id="strip">
       <div id="frames"></div>
-      <div class="strip-footer">4 CUTS STUDIO</div>
+      <div class="footer-strip">4 CUTS STUDIO</div>
     </div>
   </div>
 
-  <div class="result-actions">
+  <div class="actions">
     <button class="secondary" id="retakeBtn">
       RETAKE
     </button>
@@ -399,15 +391,14 @@ video {
   </div>
 
   <p class="note">
-    On iPhone, if the image opens in a new tab,
-    press and hold it, then choose Save to Photos.
+    Save your memories to your phone.
   </p>
 
 </section>
 
-<div class="foot">
+<footer>
   MADE FOR YOUR LITTLE MOMENTS ♡
-</div>
+</footer>
 
 </div>
 
@@ -415,175 +406,209 @@ video {
 
 <script>
 
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-const statusEl = document.getElementById('status');
-const placeholder = document.getElementById('placeholder');
-const countdownEl = document.getElementById('countdown');
-const startBtn = document.getElementById('startBtn');
-const result = document.getElementById('result');
-const framesEl = document.getElementById('frames');
-
-const progressDots = [...document.querySelectorAll('.dot')];
+const statusEl = document.getElementById("status");
+const countdownEl = document.getElementById("countdown");
+const startBtn = document.getElementById("startBtn");
+const result = document.getElementById("result");
+const framesEl = document.getElementById("frames");
 
 let stream = null;
-let selectedStyle = 'mono';
 let photos = [];
 let busy = false;
+let selectedStyle = "mono";
 
 const filters = {
-  mono: 'grayscale(1) contrast(1.12) brightness(.94)',
-  pink: 'sepia(.12) saturate(1.18) hue-rotate(305deg) brightness(1.05)',
-  vintage: 'sepia(.48) saturate(.78) contrast(1.08) brightness(.94)',
-  color: 'none'
+  mono: "grayscale(1) contrast(1.12) brightness(.94)",
+  pink: "sepia(.12) saturate(1.18) hue-rotate(305deg) brightness(1.05)",
+  vintage: "sepia(.48) saturate(.78) contrast(1.08)",
+  color: "none"
 };
 
-document.querySelectorAll('.style').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.style').forEach(b =>
-      b.classList.remove('active')
-    );
+const dots = [...document.querySelectorAll(".dot")];
 
-    btn.classList.add('active');
-    selectedStyle = btn.dataset.style;
+// SELECT STYLE
+
+document.querySelectorAll(".style").forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    document.querySelectorAll(".style").forEach(item => {
+      item.classList.remove("active");
+    });
+
+    button.classList.add("active");
+    selectedStyle = button.dataset.style;
+
   });
+
 });
+
+// OPEN CAMERA
 
 async function openCamera() {
 
-  if (!navigator.mediaDevices?.getUserMedia) {
-    throw new Error(
-      'Camera access needs Safari/Chrome on a secure HTTPS page.'
-    );
+  if (!navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia) {
+
+    throw new Error("Camera requires an HTTPS website.");
+
   }
 
   if (stream) {
-    stream.getTracks().forEach(t => t.stop());
+    stream.getTracks().forEach(track => track.stop());
   }
 
   stream = await navigator.mediaDevices.getUserMedia({
+
     video: {
-      facingMode: document.getElementById('cameraChoice').value,
+      facingMode: document.getElementById("cameraChoice").value,
       width: { ideal: 1280 },
       height: { ideal: 960 }
     },
+
     audio: false
+
   });
 
   video.srcObject = stream;
-  video.style.display = 'block';
+  video.style.display = "block";
 
   video.style.transform =
-    document.getElementById('cameraChoice').value === 'user'
-      ? 'scaleX(-1)'
-      : 'none';
+    document.getElementById("cameraChoice").value === "user"
+      ? "scaleX(-1)"
+      : "none";
 
-  placeholder.classList.add('hidden');
+  document.getElementById("placeholder")
+    .classList.add("hidden");
 
   await video.play();
+
 }
 
-document.getElementById('cameraChoice')
-  .addEventListener('change', async () => {
+// CHANGE CAMERA
 
-    if (stream) {
-      try {
-        await openCamera();
-        statusEl.textContent = 'Camera changed. Ready when you are.';
-      } catch (e) {
-        statusEl.textContent = e.message;
-      }
-    }
-  });
+document.getElementById("cameraChoice")
+.addEventListener("change", async () => {
+
+  if (!stream) return;
+
+  try {
+    await openCamera();
+    statusEl.textContent = "Camera changed!";
+  } catch(error) {
+    statusEl.textContent = error.message;
+  }
+
+});
+
+// WAIT
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// COUNTDOWN
+
 async function countdown(seconds) {
 
   if (seconds === 0) return;
 
-  countdownEl.style.display = 'block';
+  countdownEl.style.display = "block";
 
-  for (let n = seconds; n > 0; n--) {
-    countdownEl.textContent = n;
+  for (let i = seconds; i > 0; i--) {
+
+    countdownEl.textContent = i;
     await wait(1000);
+
   }
 
-  countdownEl.style.display = 'none';
+  countdownEl.style.display = "none";
+
 }
+
+// TAKE PHOTO
 
 function capture() {
 
-  const w = video.videoWidth;
-  const h = video.videoHeight;
+  const width = video.videoWidth;
+  const height = video.videoHeight;
 
-  if (!w || !h) {
-    throw new Error('Camera is not ready yet. Please try again.');
+  if (!width || !height) {
+    throw new Error("Camera is not ready. Try again.");
   }
 
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = width;
+  canvas.height = height;
 
   ctx.save();
 
-  if (document.getElementById('cameraChoice').value === 'user') {
-    ctx.translate(w, 0);
+  if (document.getElementById("cameraChoice").value === "user") {
+    ctx.translate(width, 0);
     ctx.scale(-1, 1);
   }
 
   ctx.filter = filters[selectedStyle];
-  ctx.drawImage(video, 0, 0, w, h);
+
+  ctx.drawImage(video, 0, 0, width, height);
 
   ctx.restore();
 
-  return canvas.toDataURL('image/jpeg', .92);
+  return canvas.toDataURL("image/jpeg", 0.92);
+
 }
+
+// UPDATE PROGRESS
 
 function updateProgress() {
 
-  progressDots.forEach((dot, i) => {
-    dot.classList.toggle('done', i < photos.length);
+  dots.forEach((dot, index) => {
+
+    dot.classList.toggle("done", index < photos.length);
+
   });
 
 }
+
+// CREATE PHOTO STRIP
 
 function renderStrip() {
 
-  framesEl.innerHTML = '';
+  framesEl.innerHTML = "";
 
   photos.forEach(src => {
 
-    const frame = document.createElement('div');
-    frame.className = 'frame';
+    const frame = document.createElement("div");
+    frame.className = "frame";
 
-    const img = document.createElement('img');
+    const img = document.createElement("img");
     img.src = src;
-    img.alt = 'Photo booth frame';
 
-    framesEl.appendChild(frame);
     frame.appendChild(img);
+    framesEl.appendChild(frame);
 
   });
 
-  const strip = document.getElementById('strip');
+  const strip = document.getElementById("strip");
 
-  strip.style.background =
-    selectedStyle === 'pink' ? '#f4dce5' :
-    selectedStyle === 'vintage' ? '#d8c6a6' :
-    selectedStyle === 'color' ? '#d7e5ef' :
-    '#090909';
+  const backgrounds = {
+    mono: "#090909",
+    pink: "#f4dce5",
+    vintage: "#d8c6a6",
+    color: "#d7e5ef"
+  };
 
-  strip.querySelector('.strip-footer').style.color =
-    selectedStyle === 'pink' ||
-    selectedStyle === 'vintage' ||
-    selectedStyle === 'color'
-      ? '#171717'
-      : '#eee';
+  strip.style.background = backgrounds[selectedStyle];
+
+  strip.querySelector(".footer-strip").style.color =
+    selectedStyle === "mono" ? "#fff" : "#171717";
+
 }
+
+// START SESSION
 
 async function startSession() {
 
@@ -595,7 +620,7 @@ async function startSession() {
   photos = [];
   updateProgress();
 
-  result.style.display = 'none';
+  result.style.display = "none";
 
   try {
 
@@ -603,167 +628,184 @@ async function startSession() {
       await openCamera();
     }
 
-    statusEl.textContent = 'Get ready…';
-
     for (let i = 0; i < 4; i++) {
 
-      statusEl.textContent = `PHOTO ${i + 1} OF 4`;
+      statusEl.textContent = "PHOTO " + (i + 1) + " OF 4";
 
-      await countdown(
-        Number(document.getElementById('timerChoice').value)
-      );
+      const seconds =
+        Number(document.getElementById("timerChoice").value);
+
+      await countdown(seconds);
 
       photos.push(capture());
+
       updateProgress();
 
       if (i < 3) {
         await wait(1100);
       }
+
     }
 
     renderStrip();
 
-    result.style.display = 'block';
+    result.style.display = "block";
 
-    statusEl.textContent = 'Your photo strip is ready ♡';
+    statusEl.textContent = "YOUR PHOTO STRIP IS READY ♡";
 
     result.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
+      behavior: "smooth",
+      block: "start"
     });
 
-  } catch (e) {
+  } catch(error) {
 
     statusEl.textContent =
-      e.name === 'NotAllowedError'
-        ? 'Camera permission was not granted. Allow camera access in your browser settings.'
-        : e.message;
+      error.name === "NotAllowedError"
+      ? "Camera permission denied. Allow camera access in Safari settings."
+      : error.message;
 
   } finally {
 
     busy = false;
     startBtn.disabled = false;
-    countdownEl.style.display = 'none';
+    countdownEl.style.display = "none";
 
   }
+
 }
 
-startBtn.addEventListener('click', startSession);
+startBtn.addEventListener("click", startSession);
 
-document.getElementById('retakeBtn')
-  .addEventListener('click', () => {
+// RETAKE
 
-    result.style.display = 'none';
-    photos = [];
-    updateProgress();
+document.getElementById("retakeBtn")
+.addEventListener("click", () => {
 
-    statusEl.textContent = 'Ready for another session.';
+  photos = [];
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+  updateProgress();
+
+  result.style.display = "none";
+
+  statusEl.textContent = "Ready for another session.";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+});
+
+// SAVE PHOTO STRIP
+
+document.getElementById("saveBtn")
+.addEventListener("click", () => {
+
+  const width = 720;
+  const frameHeight = 540;
+  const gap = 18;
+  const padding = 24;
+  const footerHeight = 70;
+
+  const output = document.createElement("canvas");
+
+  output.width = width;
+
+  output.height =
+    padding * 2 +
+    frameHeight * 4 +
+    gap * 3 +
+    footerHeight;
+
+  const c = output.getContext("2d");
+
+  const backgrounds = {
+    mono: "#090909",
+    pink: "#f4dce5",
+    vintage: "#d8c6a6",
+    color: "#d7e5ef"
+  };
+
+  c.fillStyle = backgrounds[selectedStyle];
+  c.fillRect(0, 0, output.width, output.height);
+
+  const images = [...framesEl.querySelectorAll("img")];
+
+  let loaded = 0;
+
+  images.forEach((image, index) => {
+
+    const img = new Image();
+
+    img.onload = () => {
+
+      const targetW = width - padding * 2;
+      const targetH = frameHeight;
+
+      const ratio = Math.max(
+        targetW / img.naturalWidth,
+        targetH / img.naturalHeight
+      );
+
+      const sw = targetW / ratio;
+      const sh = targetH / ratio;
+
+      const sx = (img.naturalWidth - sw) / 2;
+      const sy = (img.naturalHeight - sh) / 2;
+
+      const y = padding + index * (frameHeight + gap);
+
+      c.drawImage(
+        img,
+        sx, sy, sw, sh,
+        padding, y, targetW, targetH
+      );
+
+      loaded++;
+
+      if (loaded === images.length) {
+
+        c.fillStyle =
+          selectedStyle === "mono" ? "#fff" : "#171717";
+
+        c.font = "22px Arial";
+        c.textAlign = "center";
+
+        c.fillText(
+          "4 CUTS STUDIO",
+          width / 2,
+          output.height - 28
+        );
+
+        const link = document.createElement("a");
+
+        link.download = "4-cuts-studio.jpg";
+        link.href = output.toDataURL("image/jpeg", 0.95);
+
+        link.click();
+
+      }
+
+    };
+
+    img.src = image.src;
 
   });
 
-document.getElementById('saveBtn')
-  .addEventListener('click', () => {
+});
 
-    const strip = document.getElementById('strip');
-    const images = [...strip.querySelectorAll('img')];
+// STOP CAMERA WHEN LEAVING
 
-    const width = 720;
-    const frameH = 540;
-    const gap = 18;
-    const pad = 24;
-    const footerH = 70;
-
-    const out = document.createElement('canvas');
-
-    out.width = width;
-    out.height = pad * 2 + frameH * 4 + gap * 3 + footerH;
-
-    const c = out.getContext('2d');
-
-    const bg =
-      selectedStyle === 'pink' ? '#f4dce5' :
-      selectedStyle === 'vintage' ? '#d8c6a6' :
-      selectedStyle === 'color' ? '#d7e5ef' :
-      '#090909';
-
-    c.fillStyle = bg;
-    c.fillRect(0, 0, out.width, out.height);
-
-    let loaded = 0;
-
-    images.forEach((img, i) => {
-
-      const im = new Image();
-
-      im.onload = () => {
-
-        const y = pad + i * (frameH + gap);
-
-        const targetW = width - 2 * pad;
-        const targetH = frameH;
-
-        const ratio = Math.max(
-          targetW / im.naturalWidth,
-          targetH / im.naturalHeight
-        );
-
-        const sw = targetW / ratio;
-        const sh = targetH / ratio;
-
-        const sx = (im.naturalWidth - sw) / 2;
-        const sy = (im.naturalHeight - sh) / 2;
-
-        c.drawImage(
-          im,
-          sx, sy, sw, sh,
-          pad, y, targetW, targetH
-        );
-
-        loaded++;
-
-        if (loaded === images.length) {
-
-          c.fillStyle =
-            selectedStyle === 'mono' ? '#eee' : '#171717';
-
-          c.font = '22px Arial';
-          c.textAlign = 'center';
-
-          c.fillText(
-            '4 CUTS STUDIO',
-            width / 2,
-            out.height - 28
-          );
-
-          const a = document.createElement('a');
-
-          a.href = out.toDataURL('image/jpeg', .95);
-          a.download = '4-cuts-studio.jpg';
-          a.click();
-
-        }
-
-      };
-
-      im.src = img.src;
-
-    });
-
-  });
-
-window.addEventListener('pagehide', () => {
+window.addEventListener("pagehide", () => {
 
   if (stream) {
-    stream.getTracks().forEach(t => t.stop());
+    stream.getTracks().forEach(track => track.stop());
   }
 
 });
 
 </script>
+
 </body>
 </html>
