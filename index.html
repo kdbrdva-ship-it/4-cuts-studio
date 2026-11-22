@@ -5,66 +5,148 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>4 CUTS STUDIO</title>
+
 <style>
 *{box-sizing:border-box}
+
 body{
  margin:0;background:#090909;color:white;
  font-family:Arial,sans-serif;text-align:center;
  padding:25px 15px
 }
+
 h1{letter-spacing:5px;font-size:27px;margin:15px 0 8px}
 .sub{color:#aaa;font-size:12px;letter-spacing:3px;margin-bottom:30px}
 h2{font-size:17px;font-weight:500;margin:25px 0 15px}
+
 .themes{
  display:grid;grid-template-columns:1fr 1fr;
  gap:12px;max-width:430px;margin:auto
 }
+
 .theme{
  background:#181818;color:white;border:1px solid #333;
  border-radius:12px;padding:15px 8px;cursor:pointer
 }
+
 .theme.active{border:2px solid white;background:#292929}
 .theme b{display:block;font-size:14px;margin-bottom:6px}
 .theme small{color:#aaa;font-size:11px}
+
 button{
  border:0;border-radius:30px;padding:14px 24px;
  background:white;color:#111;font-weight:bold;
  font-size:13px;letter-spacing:1px;cursor:pointer;margin:8px
 }
+
 button:disabled{opacity:.4;cursor:default}
+
 .camera{max-width:420px;margin:20px auto}
+
 video{
  width:100%;aspect-ratio:4/5;object-fit:cover;
  border-radius:12px;background:#222;
  transform:scaleX(-1)
 }
+
 #status{color:#bbb;font-size:13px;min-height:22px;margin:12px}
 #count{font-size:45px;font-weight:bold;margin:10px}
 #result{margin:25px auto;max-width:390px}
 canvas{width:100%;height:auto;border-radius:4px}
 .hidden{display:none}
+
 .frames{
  display:grid;grid-template-columns:1fr 1fr;
  gap:12px;margin:20px 0
 }
+
 .frame-card{
  background:#181818;border:1px solid #333;
  border-radius:10px;padding:8px
 }
+
 .frame-card canvas{width:100%;display:block}
 .frame-card p{font-size:12px;color:#aaa;margin:9px 0 2px}
+
 .frame-card button{
  font-size:10px;padding:11px 12px;margin:8px 0 3px;
  width:100%;letter-spacing:.5px
 }
+
 .actions{display:flex;flex-direction:column;align-items:center}
 .actions button{width:100%;max-width:300px}
+
 .note{
  font-size:11px;color:#777;line-height:1.6;
  margin:25px auto;max-width:330px
 }
+
+/* PHOTO ADJUSTMENTS */
+
+.adjustments{
+ background:#181818;
+ border:1px solid #333;
+ border-radius:14px;
+ padding:20px 17px;
+ margin:25px 0;
+ text-align:left
+}
+
+.adjustments h2{
+ text-align:center;
+ letter-spacing:2px;
+ margin:5px 0 8px
+}
+
+.adjustments .hint{
+ color:#888;
+ font-size:11px;
+ text-align:center;
+ line-height:1.5;
+ margin-bottom:22px
+}
+
+.control{margin:22px 0}
+
+.control-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:12px
+}
+
+.control-top label{
+ font-size:11px;
+ letter-spacing:1.5px;
+ color:#ddd
+}
+
+.control-top span{
+ font-size:12px;
+ color:#aaa;
+ min-width:42px;
+ text-align:right
+}
+
+input[type="range"]{
+ width:100%;
+ accent-color:white;
+ cursor:pointer;
+ height:5px
+}
+
+.reset-btn{
+ display:block;
+ width:100%;
+ margin:20px 0 0;
+ background:#292929;
+ color:white;
+ border:1px solid #444
+}
+
 </style>
 </head>
+
 <body>
 
 <h1>4 CUTS STUDIO</h1>
@@ -76,12 +158,15 @@ canvas{width:100%;height:auto;border-radius:4px}
 <button class="theme active" data-theme="bw" onclick="chooseTheme(this)">
 <b>CLASSIC B&W</b><small>Timeless black & white</small>
 </button>
+
 <button class="theme" data-theme="pink" onclick="chooseTheme(this)">
 <b>COQUETTE ♡</b><small>Pink bows & romance</small>
 </button>
+
 <button class="theme" data-theme="vintage" onclick="chooseTheme(this)">
 <b>VINTAGE</b><small>Retro film mood</small>
 </button>
+
 <button class="theme" data-theme="color" onclick="chooseTheme(this)">
 <b>COLORFUL ✦</b><small>Fun & bright</small>
 </button>
@@ -89,41 +174,96 @@ canvas{width:100%;height:auto;border-radius:4px}
 
 <div class="camera">
 <h2>YOUR CAMERA</h2>
+
 <video id="video" autoplay playsinline muted></video>
+
 <div id="status">Выбери стиль и включи камеру</div>
 <div id="count"></div>
+
 <button id="cameraBtn" onclick="startCamera()">OPEN CAMERA</button>
+
 <button id="shoot" onclick="startSession()" disabled>
 START PHOTO SESSION
 </button>
 </div>
 
 <div id="result" class="hidden">
+
 <h2>YOUR PHOTO STRIP</h2>
 <canvas id="output"></canvas>
 
+<!-- MANUAL PHOTO SETTINGS -->
+
+<div class="adjustments">
+
+<h2>PHOTO ADJUSTMENTS</h2>
+
+<div class="hint">
+MAKE YOUR PHOTOS LOOK JUST RIGHT ♡<br>
+Изменяй настройки и смотри результат сразу
+</div>
+
+<div class="control">
+ <div class="control-top">
+  <label for="contrast">CONTRAST</label>
+  <span id="contrastValue">100%</span>
+ </div>
+ <input type="range" id="contrast"
+ min="50" max="180" value="100" step="1">
+</div>
+
+<div class="control">
+ <div class="control-top">
+  <label for="brightness">BRIGHTNESS</label>
+  <span id="brightnessValue">100%</span>
+ </div>
+ <input type="range" id="brightness"
+ min="50" max="150" value="100" step="1">
+</div>
+
+<div class="control">
+ <div class="control-top">
+  <label for="saturation">SATURATION</label>
+  <span id="saturationValue">100%</span>
+ </div>
+ <input type="range" id="saturation"
+ min="0" max="200" value="100" step="1">
+</div>
+
+<button class="reset-btn" onclick="resetAdjustments()">
+↺ RESET ADJUSTMENTS
+</button>
+
+</div>
+
 <h2>YOUR FOUR CUTS</h2>
+
 <div class="frames">
+
  <div class="frame-card">
   <canvas id="frame0"></canvas>
   <p>PHOTO 01</p>
   <button onclick="retake(0)" id="retake0">RETAKE PHOTO</button>
  </div>
+
  <div class="frame-card">
   <canvas id="frame1"></canvas>
   <p>PHOTO 02</p>
   <button onclick="retake(1)" id="retake1">RETAKE PHOTO</button>
  </div>
+
  <div class="frame-card">
   <canvas id="frame2"></canvas>
   <p>PHOTO 03</p>
   <button onclick="retake(2)" id="retake2">RETAKE PHOTO</button>
  </div>
+
  <div class="frame-card">
   <canvas id="frame3"></canvas>
   <p>PHOTO 04</p>
   <button onclick="retake(3)" id="retake3">RETAKE PHOTO</button>
  </div>
+
 </div>
 
 <div class="actions">
@@ -131,6 +271,7 @@ START PHOTO SESSION
  <button onclick="sharePhoto()">SHARE PHOTO</button>
  <button onclick="again()">NEW PHOTO SESSION</button>
 </div>
+
 </div>
 
 <div class="note">
@@ -139,12 +280,17 @@ Made with love ♡
 </div>
 
 <script>
+
 const video=document.getElementById('video');
 const statusText=document.getElementById('status');
 const count=document.getElementById('count');
 const shoot=document.getElementById('shoot');
 const output=document.getElementById('output');
 const out=output.getContext('2d');
+
+const contrastInput=document.getElementById('contrast');
+const brightnessInput=document.getElementById('brightness');
+const saturationInput=document.getElementById('saturation');
 
 let stream=null;
 let photos=[];
@@ -154,16 +300,59 @@ let busy=false;
 const PHOTO_W=1080;
 const PHOTO_H=1350;
 
+// РУЧНЫЕ НАСТРОЙКИ
+
+let adjustments={
+ contrast:100,
+ brightness:100,
+ saturation:100
+};
+
+// БАЗОВЫЕ ЭФФЕКТЫ ТЕМ
+
+const themeFilters={
+ bw:{
+  contrast:110,
+  brightness:100,
+  saturation:0
+ },
+ pink:{
+  contrast:105,
+  brightness:105,
+  saturation:115
+ },
+ vintage:{
+  contrast:105,
+  brightness:105,
+  saturation:75
+ },
+ color:{
+  contrast:110,
+  brightness:103,
+  saturation:135
+ }
+};
+
+// ВЫБОР ТЕМЫ
+
 function chooseTheme(btn){
  if(busy)return;
 
  document.querySelectorAll('.theme').forEach(x=>{
   x.classList.remove('active');
  });
+
  btn.classList.add('active');
  selected=btn.dataset.theme;
+
  statusText.textContent='Стиль выбран! Теперь включи камеру.';
+
+ if(photos.length===4){
+  renderAll();
+ }
 }
+
+// КАМЕРА
 
 async function startCamera(){
  try{
@@ -184,6 +373,7 @@ async function startCamera(){
 
   shoot.disabled=false;
   statusText.textContent='Камера готова! Нажми START PHOTO SESSION.';
+
  }catch(e){
   statusText.textContent='Не удалось открыть камеру. Разреши доступ в браузере.';
  }
@@ -198,10 +388,13 @@ async function countdown(){
   count.textContent=n;
   await wait(1000);
  }
+
  count.textContent='✦';
  await wait(300);
  count.textContent='';
 }
+
+// СЪЁМКА
 
 async function startSession(){
  if(!stream||busy)return;
@@ -215,14 +408,20 @@ async function startSession(){
  try{
   for(let i=0;i<4;i++){
    statusText.textContent='PHOTO '+(i+1)+' OF 4';
+
    await countdown();
+
    photos.push(capture());
+
    await wait(500);
   }
 
   renderAll();
+
   document.getElementById('result').classList.remove('hidden');
-  statusText.textContent='Готово! Теперь можешь переснять любой кадр ♡';
+
+  statusText.textContent='Готово! Теперь можешь редактировать фотографии ♡';
+
  }catch(e){
   statusText.textContent='Что-то пошло не так. Попробуй ещё раз.';
  }
@@ -231,8 +430,11 @@ async function startSession(){
  shoot.disabled=false;
 }
 
+// СОХРАНЯЕМ ОРИГИНАЛЬНЫЙ СНИМОК БЕЗ ЭФФЕКТОВ
+
 function capture(){
  const c=document.createElement('canvas');
+
  c.width=PHOTO_W;
  c.height=PHOTO_H;
 
@@ -257,33 +459,60 @@ function capture(){
  x.save();
  x.translate(PHOTO_W,0);
  x.scale(-1,1);
+
  x.drawImage(
   video,
   sx,sy,sWidth,sHeight,
   0,0,PHOTO_W,PHOTO_H
  );
+
  x.restore();
 
- decoratePhoto(x);
  return c;
 }
 
-function decoratePhoto(x){
- if(selected==='bw'){
-  x.globalCompositeOperation='saturation';
-  x.fillStyle='rgba(0,0,0,1)';
-  x.fillRect(0,0,PHOTO_W,PHOTO_H);
-  x.globalCompositeOperation='source-over';
+// ПРИМЕНЕНИЕ ФИЛЬТРОВ И РУЧНЫХ НАСТРОЕК
 
-  x.fillStyle='rgba(0,0,0,.08)';
-  x.fillRect(0,0,PHOTO_W,PHOTO_H);
+function drawProcessed(target,source){
+
+ const x=target.getContext('2d');
+
+ const base=themeFilters[selected];
+
+ const contrast=base.contrast*adjustments.contrast/100;
+ const brightness=base.brightness*adjustments.brightness/100;
+ const saturation=base.saturation*adjustments.saturation/100;
+
+ x.clearRect(0,0,PHOTO_W,PHOTO_H);
+
+ x.save();
+
+ x.filter=
+  `contrast(${contrast}%) `+
+  `brightness(${brightness}%) `+
+  `saturate(${saturation}%)`;
+
+ x.drawImage(source,0,0,PHOTO_W,PHOTO_H);
+
+ x.restore();
+
+ decoratePhoto(x);
+}
+
+// ДЕКОРАТИВНЫЕ ЭЛЕМЕНТЫ
+
+function decoratePhoto(x){
+
+ if(selected==='bw'){
 
   x.strokeStyle='white';
   x.lineWidth=12;
   x.strokeRect(10,10,PHOTO_W-20,PHOTO_H-20);
+
  }
 
  if(selected==='pink'){
+
   x.fillStyle='rgba(255,190,215,.13)';
   x.fillRect(0,0,PHOTO_W,PHOTO_H);
 
@@ -299,26 +528,72 @@ function decoratePhoto(x){
   x.strokeStyle='rgba(255,255,255,.85)';
   x.lineWidth=12;
   x.strokeRect(12,12,PHOTO_W-24,PHOTO_H-24);
+
  }
 
  if(selected==='vintage'){
+
   x.fillStyle='rgba(180,120,55,.13)';
   x.fillRect(0,0,PHOTO_W,PHOTO_H);
 
   x.strokeStyle='rgba(255,235,190,.75)';
   x.lineWidth=18;
   x.strokeRect(18,18,PHOTO_W-36,PHOTO_H-36);
+
  }
 
  if(selected==='color'){
+
   x.font='90px Arial';
   x.fillStyle='white';
   x.fillText('✦',35,120);
   x.fillText('✧',PHOTO_W-130,PHOTO_H-45);
+
+ }
+
+}
+
+// ИЗМЕНЕНИЕ НАСТРОЕК
+
+function updateAdjustments(){
+
+ adjustments.contrast=Number(contrastInput.value);
+ adjustments.brightness=Number(brightnessInput.value);
+ adjustments.saturation=Number(saturationInput.value);
+
+ document.getElementById('contrastValue').textContent=
+  adjustments.contrast+'%';
+
+ document.getElementById('brightnessValue').textContent=
+  adjustments.brightness+'%';
+
+ document.getElementById('saturationValue').textContent=
+  adjustments.saturation+'%';
+
+ if(photos.length===4){
+  renderAll();
  }
 }
 
-// Пересъёмка только выбранного кадра
+contrastInput.addEventListener('input',updateAdjustments);
+brightnessInput.addEventListener('input',updateAdjustments);
+saturationInput.addEventListener('input',updateAdjustments);
+
+// ВОЗВРАТ ИСХОДНЫХ НАСТРОЕК
+
+function resetAdjustments(){
+
+ contrastInput.value=100;
+ brightnessInput.value=100;
+ saturationInput.value=100;
+
+ updateAdjustments();
+
+ statusText.textContent='Настройки возвращены к исходным ♡';
+}
+
+// ПЕРЕСЪЁМКА ОДНОГО КАДРА
+
 async function retake(index){
  if(!stream||busy)return;
 
@@ -334,12 +609,12 @@ async function retake(index){
  try{
   await countdown();
 
-  // Меняем только один элемент массива
   photos[index]=capture();
 
   renderAll();
 
-  statusText.textContent='PHOTO '+(index+1)+' обновлено! Остальные кадры сохранены ♡';
+  statusText.textContent='PHOTO '+(index+1)+' обновлено! ♡';
+
  }catch(e){
   statusText.textContent='Не удалось переснять кадр. Попробуй ещё раз.';
  }
@@ -352,25 +627,35 @@ async function retake(index){
  });
 }
 
-// Обновляем все миниатюры и готовую фотополоску
+// ОБНОВЛЕНИЕ ВСЕХ ФОТОГРАФИЙ
+
 function renderAll(){
+
  photos.forEach((photo,i)=>{
+
   const c=document.getElementById('frame'+i);
+
   c.width=PHOTO_W;
   c.height=PHOTO_H;
-  c.getContext('2d').drawImage(photo,0,0);
+
+  drawProcessed(c,photo);
+
  });
 
  renderStrip();
 }
 
+// СОЗДАНИЕ ФОТОПОЛОСКИ
+
 function renderStrip(){
+
  const w=1140;
  const margin=30;
  const photoHeight=1350;
  const gap=35;
  const top=190;
  const bottom=120;
+
  const h=top+4*(photoHeight+gap)+bottom;
 
  output.width=w;
@@ -379,10 +664,25 @@ function renderStrip(){
  let bg='#f4f1ed';
  let ink='#222';
 
- if(selected==='bw'){bg='#111';ink='#fff'}
- if(selected==='pink'){bg='#ffe5ef';ink='#9d526e'}
- if(selected==='vintage'){bg='#e6d3ae';ink='#755536'}
- if(selected==='color'){bg='#fff0a8';ink='#6734a0'}
+ if(selected==='bw'){
+  bg='#111';
+  ink='#fff';
+ }
+
+ if(selected==='pink'){
+  bg='#ffe5ef';
+  ink='#9d526e';
+ }
+
+ if(selected==='vintage'){
+  bg='#e6d3ae';
+  ink='#755536';
+ }
+
+ if(selected==='color'){
+  bg='#fff0a8';
+  ink='#6734a0';
+ }
 
  out.fillStyle=bg;
  out.fillRect(0,0,w,h);
@@ -404,12 +704,16 @@ function renderStrip(){
  out.fillText(subtitles[selected],w/2,125);
 
  photos.forEach((photo,i)=>{
+
   const y=top+i*(photoHeight+gap);
 
-  out.drawImage(photo,margin,y,PHOTO_W,photoHeight);
+  const frame=document.getElementById('frame'+i);
+
+  out.drawImage(frame,margin,y,PHOTO_W,photoHeight);
 
   out.strokeStyle=ink;
   out.lineWidth=selected==='pink'?7:4;
+
   out.strokeRect(margin,y,PHOTO_W,photoHeight);
 
   if(selected==='pink'){
@@ -425,101 +729,155 @@ function renderStrip(){
    out.textAlign='left';
    out.fillText('FILM 04 · NO.'+(i+1),margin+20,y+photoHeight-25);
   }
+
  });
 
  out.textAlign='center';
  out.fillStyle=ink;
  out.font='23px Arial';
  out.fillText('THANK YOU FOR THE MEMORIES',w/2,h-55);
+
 }
 
-// Создаём JPG
+// СОЗДАНИЕ JPG
+
 function createImageFile(){
+
  return new Promise((resolve,reject)=>{
+
   output.toBlob(blob=>{
+
    if(blob){
+
     resolve(new File(
      [blob],
      '4-cuts-studio.jpg',
      {type:'image/jpeg'}
     ));
+
    }else{
+
     reject(new Error('Не удалось создать изображение'));
+
    }
+
   },'image/jpeg',0.98);
+
  });
+
 }
 
-// Сохранение через меню iPhone
+// СОХРАНЕНИЕ В ГАЛЕРЕЮ
+
 async function saveToGallery(){
+
  try{
+
   const file=await createImageFile();
 
   if(navigator.share&&navigator.canShare&&
      navigator.canShare({files:[file]})){
+
    await navigator.share({
     files:[file],
     title:'4 CUTS STUDIO',
     text:'My four cuts ♡'
    });
+
    statusText.textContent='Выбери «Сохранить изображение» в меню iPhone ♡';
+
   }else{
+
    openImageForSaving(file);
+
   }
+
  }catch(e){
+
   if(e.name==='AbortError'){
+
    statusText.textContent='Сохранение отменено.';
+
   }else{
+
    statusText.textContent='Не получилось открыть меню. Попробуй SHARE PHOTO.';
+
   }
+
  }
+
 }
 
-// Отправка фотографии
+// ОТПРАВКА ФОТОГРАФИИ
+
 async function sharePhoto(){
+
  try{
+
   const file=await createImageFile();
 
   if(navigator.share&&navigator.canShare&&
      navigator.canShare({files:[file]})){
+
    await navigator.share({
     files:[file],
     title:'4 CUTS STUDIO',
     text:'My four cuts ♡'
    });
+
   }else{
+
    openImageForSaving(file);
+
    statusText.textContent='Изображение открыто. Можно сохранить его через браузер.';
+
   }
+
  }catch(e){
+
   if(e.name!=='AbortError'){
    statusText.textContent='Не удалось открыть меню отправки.';
   }
+
  }
+
 }
 
 function openImageForSaving(file){
+
  const url=URL.createObjectURL(file);
  const newTab=window.open(url,'_blank');
 
  if(!newTab){
+
   const link=document.createElement('a');
+
   link.href=url;
   link.download=file.name;
   link.click();
+
  }
 
  statusText.textContent='Открой изображение и сохрани его в Фото.';
+
 }
 
+// НОВАЯ ФОТОСЕССИЯ
+
 function again(){
+
  if(busy)return;
 
  photos=[];
+
  document.getElementById('result').classList.add('hidden');
+
  statusText.textContent='Готова к новой съёмке!';
  count.textContent='';
+
 }
+
 </script>
+
 </body>
 </html>
